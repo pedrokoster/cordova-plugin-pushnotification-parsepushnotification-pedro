@@ -23,8 +23,8 @@ You can see Plugins For Cordova in one page: http://cranberrygame.github.io?refe
 ## Cordova cli ##
 https://cordova.apache.org/docs/en/edge/guide_cli_index.md.html#The%20Command-Line%20Interface - npm install -g cordova@5.0.0
 ```c
-cordova plugin add cordova-plugin-pushnotification-parsepushnotification
-(when build error, use github url: cordova plugin add https://github.com/cranberrygame/cordova-plugin-pushnotification-parsepushnotification)
+
+(when build error, use github url: cordova plugin add https://github.com/pedrokoster/cordova-plugin-pushnotification-parsepushnotification-pedro)
 ```
 
 ## Xdk ##
