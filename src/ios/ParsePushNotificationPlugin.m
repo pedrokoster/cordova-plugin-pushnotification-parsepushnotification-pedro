@@ -73,47 +73,16 @@
     PFInstallation *currentInstallation = [PFInstallation currentInstallation];
     [currentInstallation save];    
 	//PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-	NSString *installationId = currentInstallation.installationId;	
+	//NSString *installationId = currentInstallation.installationId;	
 	//NSString *objectId = currentInstallation.objectId;
 	//NSArray *channels = currentInstallation.channels;
 	
-	//CDVPluginResult* pr = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"onRegisterAsPushNotificationClientSucceeded"];
-	//[pr setKeepCallbackAsBool:YES];
-	//[self.commandDelegate sendPluginResult:pr callbackId:callbackIdKeepCallback];
+	CDVPluginResult* pr = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"onRegisterAsPushNotificationClientSucceeded"];
+	[pr setKeepCallbackAsBool:YES];
+	[self.commandDelegate sendPluginResult:pr callbackId:callbackIdKeepCallback];
 	//CDVPluginResult* pr = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
 	//[pr setKeepCallbackAsBool:YES];
 	//[self.commandDelegate sendPluginResult:pr callbackId:callbackIdKeepCallback];	
-
-	[currentInstallation saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-        if (succeeded) {
-            // The object has been saved.
-            PFQuery *query = [PFInstallation query];
-            [query whereKey:@"installationId" equalTo:installationId];
-            [query countObjectsInBackgroundWithBlock:^(int count, NSError *error) {
-                if (!error) {
-                    CDVPluginResult* pr;
-                    if(count > 0){
-                        pr = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"onRegisterAsPushNotificationClientSucceeded"];
-                    }
-                    else{
-                        pr = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"onRegisterAsPushNotificationClientFailed"];
-                    }
-                    [pr setKeepCallbackAsBool:YES];
-                    [self.commandDelegate sendPluginResult:pr callbackId:callbackIdKeepCallback];
-                } else {
-                    CDVPluginResult* pr = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[NSString stringWithFormat:@"%@",error]];
-                    [pr setKeepCallbackAsBool:YES];
-                    [self.commandDelegate sendPluginResult:pr callbackId:callbackIdKeepCallback];
-                }
-            }];
-            
-        } else {
-            // There was a problem, check error.description
-            CDVPluginResult* pr = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[NSString stringWithFormat:@"%@",error]];
-            [pr setKeepCallbackAsBool:YES];
-            [self.commandDelegate sendPluginResult:pr callbackId:callbackIdKeepCallback];
-        }
-    }];
 }
 
 /*
@@ -159,56 +128,27 @@
         [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeAlert | UIRemoteNotificationTypeSound)];
     }
 	
-	PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-    if(currentInstallation != nil){
-        //[currentInstallation addUniqueObjectsFromArray:channel forKey:@"channels"];
-        [currentInstallation setObject:channel forKey:@"channels"];
-        [currentInstallation save];
-        
-        CDVPluginResult* pr = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"onSubscribeToChannelSucceeded"];
-        [pr setKeepCallbackAsBool:YES];
-        [self.commandDelegate sendPluginResult:pr callbackId:callbackIdKeepCallback];
-    }
-    else{
-        CDVPluginResult* pr = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"onSubscribeFailed"];
-        [pr setKeepCallbackAsBool:YES];
-        [self.commandDelegate sendPluginResult:pr callbackId:callbackIdKeepCallback];
-    }
 	
-    //PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-    //[currentInstallation addUniqueObject:channel forKey:@"channels"];
-    //[currentInstallation save];
+    PFInstallation *currentInstallation = [PFInstallation currentInstallation];
+    [currentInstallation addUniqueObject:channel forKey:@"channels"];
+    [currentInstallation save];
 
-	//CDVPluginResult* pr = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"onSubscribeToChannelSucceeded"];
-	//[pr setKeepCallbackAsBool:YES];
-	//[self.commandDelegate sendPluginResult:pr callbackId:callbackIdKeepCallback];
+	CDVPluginResult* pr = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"onSubscribeToChannelSucceeded"];
+	[pr setKeepCallbackAsBool:YES];
+	[self.commandDelegate sendPluginResult:pr callbackId:callbackIdKeepCallback];
 	//CDVPluginResult* pr = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
 	//[pr setKeepCallbackAsBool:YES];
 	//[self.commandDelegate sendPluginResult:pr callbackId:callbackIdKeepCallback];	
 }
 
 - (void) _unsubscribe:(NSString *)channel {
-	PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-    if(currentInstallation != nil){
-        [currentInstallation removeObjectsInArray:channel forKey:@"channels"];
-        [currentInstallation save];
-        
-        CDVPluginResult* pr = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"onUnsubscribeSucceeded"];
-        [pr setKeepCallbackAsBool:YES];
-        [self.commandDelegate sendPluginResult:pr callbackId:callbackIdKeepCallback];
-    }
-    else{
-        CDVPluginResult* pr = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"onUnsubscribeFailed"];
-        [pr setKeepCallbackAsBool:YES];
-        [self.commandDelegate sendPluginResult:pr callbackId:callbackIdKeepCallback];
-    }
-    //PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-    //[currentInstallation removeObject:channel forKey:@"channels"];
-    //[currentInstallation save];
+    PFInstallation *currentInstallation = [PFInstallation currentInstallation];
+    [currentInstallation removeObject:channel forKey:@"channels"];
+    [currentInstallation save];
 
-	//CDVPluginResult* pr = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"onUnsubscribeSucceeded"];
-	//[pr setKeepCallbackAsBool:YES];
-	//[self.commandDelegate sendPluginResult:pr callbackId:callbackIdKeepCallback];
+	CDVPluginResult* pr = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"onUnsubscribeSucceeded"];
+	[pr setKeepCallbackAsBool:YES];
+	[self.commandDelegate sendPluginResult:pr callbackId:callbackIdKeepCallback];
 	//CDVPluginResult* pr = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
 	//[pr setKeepCallbackAsBool:YES];
 	//[self.commandDelegate sendPluginResult:pr callbackId:callbackIdKeepCallback];

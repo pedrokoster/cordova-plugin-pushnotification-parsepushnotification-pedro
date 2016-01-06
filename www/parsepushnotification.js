@@ -34,8 +34,8 @@ module.exports = {
 				}			
 			}, 
 			function (error) {
-				if (typeof error == "string") {
-					if (error == "onRegisterAsPushNotificationClientFailed") {
+				if (typeof result == "string") {
+					if (result == "onRegisterAsPushNotificationClientFailed") {
 						if (self.onRegisterAsPushNotificationClientFailed)
 							self.onRegisterAsPushNotificationClientFailed();
 					}
@@ -45,11 +45,11 @@ module.exports = {
 							self.onUnregisterFailed();
 					}
 */
-					else if (error == "onSubscribeFailed") {
+					else if (result == "onSubscribeFailed") {
 						if (self.onSubscribeToChannelFailed)
 							self.onSubscribeToChannelFailed();
 					}
-					else if (error == "onUnsubscribeFailed") {
+					else if (result == "onUnsubscribeFailed") {
 						if (self.onUnsubscribeFailed)
 							self.onUnsubscribeFailed();
 					}					
@@ -60,7 +60,6 @@ module.exports = {
 					//	if (self.onXXX)
 					//		self.onXXX(result);
 					//}
-					alert("Error: " + error);
 				}			
 			},
             'ParsePushNotificationPlugin',
