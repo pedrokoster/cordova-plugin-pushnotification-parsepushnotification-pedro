@@ -16,6 +16,10 @@ import com.parse.*;
 import android.content.SharedPreferences;
 import android.content.Context;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class ParsePushNotificationPlugin extends CordovaPlugin {
 	private static final String LOG_TAG = "ParsePushNotificationPlugin";
 	private CallbackContext callbackContextKeepCallback;
@@ -92,8 +96,8 @@ public class ParsePushNotificationPlugin extends CordovaPlugin {
 			return true;
 		}
 */		
-		else if (action.equals("subscribeToChannel")) {
-			subscribeToChannel(action, args, callbackContext);
+		else if (action.equals("subscribeToChannels")) {
+			subscribeToChannels(action, args, callbackContext);
 			
 			return true;
 		}
@@ -130,8 +134,8 @@ public class ParsePushNotificationPlugin extends CordovaPlugin {
 		//Log.d(LOG_TAG, String.format("%b", isTest));		
 		final String applicationId = args.getString(0);
 		final String clientKey = args.getString(1);		
-		Log.d(LOG_TAG, String.format("%s", applicationId));			
-		Log.d(LOG_TAG, String.format("%s", clientKey));
+		//Log.d(LOG_TAG, String.format("%s", applicationId));
+		//Log.d(LOG_TAG, String.format("%s", clientKey));
 		
 		callbackContextKeepCallback = callbackContext;
 			
@@ -163,26 +167,39 @@ public class ParsePushNotificationPlugin extends CordovaPlugin {
 	}	
 */
 
-	private void subscribeToChannel(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-		final String channel = args.getString(0);
-		Log.d(LOG_TAG, String.format("%s", channel));
-		
+	private void subscribeToChannels(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+		//final String channels = args.getString(0);
+		//Log.d(LOG_TAG, String.format("%s", channels));
+
+		JSONArray stringArray = args.getJSONArray(0);
+		final String[] channels = new String[stringArray.length()];
+		for(int i=0;i<stringArray.length();i++){
+			String hhh = stringArray.getString(i);
+			channels[i] = hhh;
+		}
+
 		cordova.getActivity().runOnUiThread(new Runnable(){
 			@Override
 			public void run() {
-				_subscribeToChannel(channel);
+				_subscribeToChannels(channels);
 			}
 		});
 	}
 
 	private void unsubscribe(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-		final String channel = args.getString(0);
-		Log.d(LOG_TAG, String.format("%s",channel));
+		//final String channels = args.getString(0);
+		//Log.d(LOG_TAG, String.format("%s",channels));
+		JSONArray stringArray = args.getJSONArray(0);
+		final String[] channels = new String[stringArray.length()];
+		for(int i=0;i<stringArray.length();i++){
+			String hhh = stringArray.getString(i);
+			channels[i] = hhh;
+		}
 		
 		cordova.getActivity().runOnUiThread(new Runnable(){
 			@Override
 			public void run() {
-				_unsubscribe(channel);
+				_unsubscribe(channels);
 			}
 		});
 	}
@@ -256,32 +273,64 @@ public class ParsePushNotificationPlugin extends CordovaPlugin {
     }
 */
 
-    private void _subscribeToChannel(String channel) {
-        ParsePush.subscribeInBackground(channel, new SaveCallback() {
+    private void _subscribeToChannels(String[] channels) {
+
+		List<String> subscribedChannels = new ArrayList<String>(Arrays.asList(channels));
+
+		ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+		installation.put("channels", subscribedChannels);
+		installation.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-            		PluginResult pr = new PluginResult(PluginResult.Status.OK, "onSubscribeToChannelSucceeded");
+            		PluginResult pr = new PluginResult(PluginResult.Status.OK, "onSubscribeToChannelsSucceeded");
             		pr.setKeepCallback(true);
             		callbackContextKeepCallback.sendPluginResult(pr);
             		//PluginResult pr = new PluginResult(PluginResult.Status.ERROR);
             		//pr.setKeepCallback(true);
-            		//callbackContextKeepCallback.sendPluginResult(pr);                    
-                } 
+            		//callbackContextKeepCallback.sendPluginResult(pr);
+                }
                 else {
             		//PluginResult pr = new PluginResult(PluginResult.Status.OK, "onSubscribeToChannelSucceeded");
             		//pr.setKeepCallback(true);
             		//callbackContextKeepCallback.sendPluginResult(pr);
-            		PluginResult pr = new PluginResult(PluginResult.Status.ERROR, "onSubscribeToChannelFailed");
+            		PluginResult pr = new PluginResult(PluginResult.Status.ERROR, "onSubscribeToChannelsFailed");
             		pr.setKeepCallback(true);
-            		callbackContextKeepCallback.sendPluginResult(pr);                    
+            		callbackContextKeepCallback.sendPluginResult(pr);
                 }
             }
         });
+
+//        ParsePush.subscribeInBackground(channels, new SaveCallback() {
+//            @Override
+//            public void done(ParseException e) {
+//                if (e == null) {
+//            		PluginResult pr = new PluginResult(PluginResult.Status.OK, "onSubscribeToChannelsSucceeded");
+//            		pr.setKeepCallback(true);
+//            		callbackContextKeepCallback.sendPluginResult(pr);
+//            		//PluginResult pr = new PluginResult(PluginResult.Status.ERROR);
+//            		//pr.setKeepCallback(true);
+//            		//callbackContextKeepCallback.sendPluginResult(pr);
+//                }
+//                else {
+//            		//PluginResult pr = new PluginResult(PluginResult.Status.OK, "onSubscribeToChannelSucceeded");
+//            		//pr.setKeepCallback(true);
+//            		//callbackContextKeepCallback.sendPluginResult(pr);
+//            		PluginResult pr = new PluginResult(PluginResult.Status.ERROR, "onSubscribeToChannelsFailed");
+//            		pr.setKeepCallback(true);
+//            		callbackContextKeepCallback.sendPluginResult(pr);
+//                }
+//            }
+//        });
     }
 
-    private void _unsubscribe(String channel) {
-        ParsePush.unsubscribeInBackground(channel, new SaveCallback() {
+    private void _unsubscribe(String[] channels) {
+
+		List<String> subscribedChannels = new ArrayList<String>(Arrays.asList(channels));
+
+		ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+		installation.removeAll("channels", subscribedChannels);
+		installation.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
@@ -290,18 +339,40 @@ public class ParsePushNotificationPlugin extends CordovaPlugin {
             		callbackContextKeepCallback.sendPluginResult(pr);
             		//PluginResult pr = new PluginResult(PluginResult.Status.ERROR);
             		//pr.setKeepCallback(true);
-            		//callbackContextKeepCallback.sendPluginResult(pr);	
-                } 
+            		//callbackContextKeepCallback.sendPluginResult(pr);
+                }
                 else {
             		//PluginResult pr = new PluginResult(PluginResult.Status.OK, "onUnsubscribeSucceeded");
             		//pr.setKeepCallback(true);
             		//callbackContextKeepCallback.sendPluginResult(pr);
             		PluginResult pr = new PluginResult(PluginResult.Status.ERROR, "onUnsubscribeFailed");
             		pr.setKeepCallback(true);
-            		callbackContextKeepCallback.sendPluginResult(pr);	
+            		callbackContextKeepCallback.sendPluginResult(pr);
                 }
             }
         });
+
+//        ParsePush.unsubscribeInBackground(channels, new SaveCallback() {
+//            @Override
+//            public void done(ParseException e) {
+//                if (e == null) {
+//            		PluginResult pr = new PluginResult(PluginResult.Status.OK, "onUnsubscribeSucceeded");
+//            		pr.setKeepCallback(true);
+//            		callbackContextKeepCallback.sendPluginResult(pr);
+//            		//PluginResult pr = new PluginResult(PluginResult.Status.ERROR);
+//            		//pr.setKeepCallback(true);
+//            		//callbackContextKeepCallback.sendPluginResult(pr);
+//                }
+//                else {
+//            		//PluginResult pr = new PluginResult(PluginResult.Status.OK, "onUnsubscribeSucceeded");
+//            		//pr.setKeepCallback(true);
+//            		//callbackContextKeepCallback.sendPluginResult(pr);
+//            		PluginResult pr = new PluginResult(PluginResult.Status.ERROR, "onUnsubscribeFailed");
+//            		pr.setKeepCallback(true);
+//            		callbackContextKeepCallback.sendPluginResult(pr);
+//                }
+//            }
+//        });
     }	
 }
 
