@@ -259,6 +259,13 @@ void MethodSwizzle(Class c, SEL originalSelector) {
     // Call existing method
     [self swizzled_application:application didReceiveRemoteNotification:userInfo];
     //[PFPush handlePush:userInfo];
+    
+    NSDictionary *apsInfo = [userInfo objectForKey:@"aps"];
+    
+    if ([apsInfo objectForKey:@"badge"]) {
+        NSInteger badgeNumber = [[apsInfo objectForKey:@"badge"] integerValue];
+        [application setApplicationIconBadgeNumber:badgeNumber];
+    }
 }
 
 @end
